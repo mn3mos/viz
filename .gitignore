@@ -1,3 +1,7 @@
+# Downloaded examples
+examples/
+
+# Intermediate build file
 *.annot
 *.cmo
 *.cma
@@ -18,3 +22,6 @@ _build/
 # oasis generated files
 setup.data
 setup.log
+
+# MacOS crappy filesystem
+.DS_Store

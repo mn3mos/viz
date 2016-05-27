@@ -1,0 +1,4 @@
+open Renderer
+
+let () =
+  mainLoop ()
