@@ -1,0 +1,32 @@
+OASISFormat: 0.4
+Name:        Viz
+Version:     0.1
+Synopsis:    A toy project with OCaml & OpenGL
+Authors:     mn3mos
+License:     CeCILL-C
+Plugins:     META (0.4), DevFiles (0.4)
+
+
+Library viz_core
+  Path:         src
+  Modules:      Renderer
+  BuildTools:   ocamlbuild
+  BuildDepends: glMLite.glut
+
+
+Executable viz
+  Path:       src
+  MainIs:     viz.ml
+  CompiledObject: best
+  BuildTools:   ocamlbuild
+  BuildDepends: glMLite.glut
+
+
+AlphaFeatures: ocamlbuild_more_args
+Document "viz_core_api"
+  Type:       ocamlbuild (0.4)
+  BuildTools: ocamldoc, ocamlbuild
+  Title: API reference for viz_core
+  XOCamlbuildPath:      src
+  XOCamlbuildExtraArgs: "-docflags '-colorize-code -short-functors -charset utf-8'"
+  XOCamlbuildLibraries: viz_core

@@ -12,16 +12,28 @@ examples/
 *.cmxs
 *.cmxa
 
+# Generated documentation
+*.docdir
+
 # ocamlbuild working directory
 _build/
+myocamlbuild.ml
 
 # ocamlbuild targets
 *.byte
 *.native
 
 # oasis generated files
+_tags
+setup.ml
 setup.data
 setup.log
+Makefile
+configure
+META
+*.mllib
+*.mldylib
+*.odocl
 
 # MacOS crappy filesystem
 .DS_Store
