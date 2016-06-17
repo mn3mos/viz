@@ -6,6 +6,40 @@ http://www.linux-nantes.org/~fmonnier/OCaml/GL/vertex_array.html
 open GL
 open Glut
 
+type color = float * float * float
+type vertex3d = float * float * float
+type mesh = vertex3d list
+type shape = Triangle of vertex3d * vertex3d * vertex3d * color
+           | Mesh of mesh;;
+
+let draw_shape = function
+  | Triangle (v1, v2, v3, (r, g, b)) ->
+    let draw_vertex = function (x,y,z) -> glVertex3 x y z in
+    glColor3 r g b;
+    glBegin GL_TRIANGLES;
+    draw_vertex v1;
+    draw_vertex v2;
+    draw_vertex v3;
+    glEnd ();
+  | Mesh vertices -> print_endline "Unsupported Mesh shape"
+;;
+
+
+
+(* The scene graph *)
+let sceneGraph : shape list ref =
+  ref [
+    Triangle ((0., 0., 0.),  (1., 0., 0.), (0., 1., 0.), (1., 0., 0.));
+    Triangle ((0., 0., 0.),  (-1., 0., 0.), (0., 1., 0.), (0., 1., 0.));
+    (* Mesh ([(0., 0., 0.)]) *)
+  ]
+
+let draw_graph() =
+  (*glutWireCube ~size:1.0*)
+  List.iter draw_shape !sceneGraph
+;;
+
+
 (* mouse coordinates *)
 let xold = ref 0
 let yold = ref 0
@@ -14,17 +48,6 @@ let b_down = ref false
 
 let angley = ref 0
 let anglex = ref 0
-
-let display() =
-  glClear [GL_COLOR_BUFFER_BIT];
-  glLoadIdentity();
-  glRotate ~angle:(float(- !angley)) ~x:1.0 ~y:0.0 ~z:0.0;
-  glRotate ~angle:(float(- !anglex)) ~x:0.0 ~y:1.0 ~z:0.0;
-  glColor3 ~r:0. ~g:1.0 ~b:0.;
-  glutWireCube ~size:1.0;
-  glFlush();
-  glutSwapBuffers();
-;;
 
 (* active mouse motion *)
 let motion ~x ~y =
@@ -61,10 +84,22 @@ let keyboard ~key ~x ~y =
   | _ -> ()
 ;;
 
+let display() =
+  glClear [GL_COLOR_BUFFER_BIT];
+  glLoadIdentity();
+  glRotate ~angle:(float(- !angley)) ~x:1.0 ~y:0.0 ~z:0.0;
+  glRotate ~angle:(float(- !anglex)) ~x:0.0 ~y:1.0 ~z:0.0;
+  glColor3 ~r:0. ~g:1.0 ~b:0.;
+  draw_graph();
+  glFlush();
+  glutSwapBuffers();
+;;
+
+
 let mainLoop () =
   ignore(glutInit Sys.argv);
   glutInitDisplayMode [GLUT_DOUBLE];
-  ignore(glutCreateWindow ~title:Sys.argv.(0));
+  ignore(glutCreateWindow ~title:(Sys.argv.(0) ^ " renderer") );
   glutDisplayFunc ~display;
   glutKeyboardFunc ~keyboard;
   glutMouseFunc ~mouse;
