@@ -7,11 +7,11 @@ License:     CeCILL-C
 Plugins:     META (0.4), DevFiles (0.4)
 
 
-Library viz_core
+Library renderer
   Path:         src
   Modules:      Renderer
   BuildTools:   ocamlbuild
-  BuildDepends: glMLite.glut
+  BuildDepends: glMLite, glMLite.glut, unix
 
 
 Executable viz
@@ -19,14 +19,14 @@ Executable viz
   MainIs:     viz.ml
   CompiledObject: best
   BuildTools:   ocamlbuild
-  BuildDepends: glMLite.glut
+  BuildDepends: renderer
 
 
 AlphaFeatures: ocamlbuild_more_args
-Document "viz_core_api"
+Document "viz renderer api"
   Type:       ocamlbuild (0.4)
   BuildTools: ocamldoc, ocamlbuild
-  Title: API reference for viz_core
+  Title: API reference for renderer
   XOCamlbuildPath:      src
   XOCamlbuildExtraArgs: "-docflags '-colorize-code -short-functors -charset utf-8'"
-  XOCamlbuildLibraries: viz_core
+  XOCamlbuildLibraries: renderer

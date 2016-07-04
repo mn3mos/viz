@@ -6,6 +6,9 @@ http://www.linux-nantes.org/~fmonnier/OCaml/GL/vertex_array.html
 open GL
 open Glut
 
+let time () = Unix.gettimeofday () *. 1000.
+
+
 type color = float * float * float
 type vertex3d = float * float * float
 type mesh = vertex3d list
@@ -21,24 +24,37 @@ let draw_shape = function
     draw_vertex v2;
     draw_vertex v3;
     glEnd ();
-  | Mesh vertices -> print_endline "Unsupported Mesh shape"
+  | Mesh _ -> failwith "Unsupported Mesh shape"
 ;;
 
 
 
 (* The scene graph *)
-let sceneGraph : shape list ref =
-  ref [
+let origSceneGraph : shape list =
+  [
     Triangle ((0., 0., 0.),  (1., 0., 0.), (0., 1., 0.), (1., 0., 0.));
     Triangle ((0., 0., 0.),  (-1., 0., 0.), (0., 1., 0.), (0., 1., 0.));
     (* Mesh ([(0., 0., 0.)]) *)
   ]
+
+let sceneGraph : shape list ref =
+  ref origSceneGraph
 
 let draw_graph() =
   (*glutWireCube ~size:1.0*)
   List.iter draw_shape !sceneGraph
 ;;
 
+let sg_oscillate () =
+  let offset = sin (time() /. 1000.) in (* Unix.gettimeofday() *)
+  let shape_oscillate = function
+    | Triangle ( (x1,y1,z1), (x2,y2,z2), (x3,y3,z3), (r, g, b)) ->
+      Triangle ( (x1,y1,z1), (x2 +. offset,y2,z2), (x3,y3,z3), (r, g, b +. offset))
+    | Mesh _ -> failwith "Unsupported Mesh shape"
+  in
+  sceneGraph := List.map shape_oscillate origSceneGraph;
+  glutPostRedisplay()
+;;
 
 (* mouse coordinates *)
 let xold = ref 0
@@ -84,17 +100,17 @@ let keyboard ~key ~x ~y =
   | _ -> ()
 ;;
 
+
 let display() =
   glClear [GL_COLOR_BUFFER_BIT];
+  (* Moves the camera *)
   glLoadIdentity();
   glRotate ~angle:(float(- !angley)) ~x:1.0 ~y:0.0 ~z:0.0;
   glRotate ~angle:(float(- !anglex)) ~x:0.0 ~y:1.0 ~z:0.0;
-  glColor3 ~r:0. ~g:1.0 ~b:0.;
   draw_graph();
   glFlush();
   glutSwapBuffers();
 ;;
-
 
 let mainLoop () =
   ignore(glutInit Sys.argv);
@@ -104,5 +120,6 @@ let mainLoop () =
   glutKeyboardFunc ~keyboard;
   glutMouseFunc ~mouse;
   glutMotionFunc ~motion;
+  glutIdleFunc ~idle:sg_oscillate;
   glutMainLoop ();
 ;;
